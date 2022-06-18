@@ -12,6 +12,18 @@ public class PlayerMove : Player
 	[SerializeField]
 	private float runSpeed;
 
+	//CharacterController 캐싱 준비
+	private CharacterController controllerCharacter = null;
+
+	//캐릭터 CollisionFlags 초기값 설정
+	private CollisionFlags collisionFlagsCharacter = CollisionFlags.None;
+
+	//캐릭터 중력값
+	private float gravity = 9.8f;
+
+	//캐릭터 중력 속도 값
+	private float verticalSpd = 0f;
+
 	//캐릭터 현재 이동 방향 초기값 설정
 	private Vector3 MoveDirect = Vector3.zero;
 	//캐릭터 CollisionFlages초기값
@@ -36,12 +48,14 @@ public class PlayerMove : Player
 	{
 		base.Start();
 		EventManager.StartListening("MoveInput", GetMoveInput);
+		controllerCharacter = GetComponent<CharacterController>();
 	}
 	void Update()
 	{
 		Move();
 		BodyDirectChange();
 		MoveAnimation(playerState);
+		setGravity();
 	}
 
 	private void Move()
@@ -71,8 +85,11 @@ public class PlayerMove : Player
 		{
 			spd = runSpeed;
 		}
+
+		Vector3 vecGravity = new Vector3(0f, verticalSpd, 0f);
+
 		//프레임이동량
-		Vector3 amount = (MoveDirect * spd * Time.deltaTime);
+		Vector3 amount = (MoveDirect * spd * Time.deltaTime)+vecGravity;
 
 		//실제이동
 		collisionFlags = playerController.Move(amount);
@@ -117,43 +134,42 @@ public class PlayerMove : Player
 
 	private void MoveAnimation(PlayerState state)
 	{
-		float nowspd = getNowVelocityVal();
-
-
-		if (nowspd > 0 && !isRun)
+		if (horizontal+vertical != 0 && !isRun)
 		{
 			playerState = PlayerState.Walk;
+			ani.SetBool("IsWalk", true);
+			ani.SetBool("IsRun", false);
 		}
-		else if(nowspd <= 0)
+		else if(horizontal + vertical == 0)
 		{
 			playerState = PlayerState.Idle;
+			ani.SetBool("IsWalk", false);
+			ani.SetBool("IsRun", false);
 		}
-		else if(nowspd > 0 && isRun)
+		else if(horizontal + vertical != 0 && isRun)
 		{
 			playerState = PlayerState.Run;
-		}
-
-		switch (state)
-		{
-			case PlayerState.Idle:
-				ani.SetBool("IsWalk", false);
-				ani.SetBool("IsRun", false);
-				break;
-			case PlayerState.Walk:
-				ani.SetBool("IsWalk", true);
-				ani.SetBool("IsRun", false);
-				break;
-			case PlayerState.Run:
-				ani.SetBool("IsWalk", false);
-				ani.SetBool("IsRun", true);
-				break;
+			ani.SetBool("IsWalk", false);
+			ani.SetBool("IsRun", true);
 		}
 	}
 
 	private void GetMoveInput(EventParam eventParam)
 	{
-		isRun = eventParam.runBool;
-		horizontal = eventParam.eventVector.x;
-		vertical = eventParam.eventVector.y;
+		isRun = eventParam.input.isRun;
+		horizontal = eventParam.input.moveVector.x;
+		vertical = eventParam.input.moveVector.y;
+	}
+
+	void setGravity()
+	{
+		if ((collisionFlagsCharacter & CollisionFlags.CollidedBelow) != 0)
+		{
+			verticalSpd = 0f;
+		}
+		else
+		{
+			verticalSpd -= gravity * Time.deltaTime;
+		}
 	}
 }

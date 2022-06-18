@@ -30,7 +30,7 @@ public class EnemyCtrl : MonoBehaviour
 
 	[Header("전투속성")]
 	//해골 체력
-	public int hp = 100;
+	public float hp = 100;
 	public int atk = 50;
 	//해골 공격 거리
 	public float AtkRange = 1.5f;
@@ -72,8 +72,8 @@ public class EnemyCtrl : MonoBehaviour
 		ani.SetBool("isDie", false);
 		ani.SetBool("isDamage", false);
 		ani.SetBool("isAttack", false);
-		skullState = SkullState.Idle;
 		theAtk();
+		skullState = SkullState.Idle;
 	}
 
 	void OnDmgAnmationFinished()
@@ -362,7 +362,6 @@ public class EnemyCtrl : MonoBehaviour
 
 		if (a.Length > 0)
 		{
-			Debug.Log("?");
 			eventParam2.eventint = atk;
 			EventManager.TriggerEvent("PlayerDamage", eventParam2);
 		}
@@ -380,10 +379,12 @@ public class EnemyCtrl : MonoBehaviour
 		{
 			count++;
 			//해골 체력을 10 빼고 
-			hp -= 10;
+			Debug.Log("?");
+			hp -= GameManager.Instance.PlayerData.damage;
 			if (hp > 0)
 			{
 				//피격 이펙트 
+				effectDamage.GetComponent<ParticleSystem>().Clear();
 				effectDamage.GetComponent<ParticleSystem>().Play();
 
 				effectDamageTween();
@@ -395,10 +396,16 @@ public class EnemyCtrl : MonoBehaviour
 				//0 보다 작으면 해골이 죽음 상태로 바꾸어라  
 				skullState = SkullState.Die;
 				effectDie.GetComponent<ParticleSystem>().Play();
+				GameObject obj = ObjectPool.Instance.GetObject(PoolObjectType.HP);
+				StartCoroutine(Wait(obj));
 			}
 		}
 	}
-
+	IEnumerator Wait(GameObject obj)
+	{
+		yield return new WaitForSeconds(1f);
+		obj.transform.position = this.transform.position;
+	}
 	/// <summary>
 	/// 피격시 몬스터 몸에서 번쩍번쩍 효과를 준다
 	/// </summary>

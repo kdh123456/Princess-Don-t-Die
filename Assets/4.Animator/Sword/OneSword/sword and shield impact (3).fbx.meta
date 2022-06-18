@@ -61,9 +61,9 @@ ModelImporter:
       curves: []
       events:
       - time: 1
-        functionName: hitEnd
+        functionName: HitEnd
         data: 
-        objectReferenceParameter: {fileID: -927199367670048503, guid: 5af8bc9dfdea51945858c443f8084b05, type: 3}
+        objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0

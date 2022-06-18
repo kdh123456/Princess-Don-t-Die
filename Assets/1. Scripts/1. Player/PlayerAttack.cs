@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class PlayerAttack : Player
 {
-	[SerializeField]
-	private int hp;
-	[SerializeField]
-	private float attackDamage;
-
 	private bool isAttack;
 	private int CountAttack;
 
@@ -18,7 +13,6 @@ public class PlayerAttack : Player
 	{
 		base.Start();
 		EventManager.StartListening("IsAttack", AttackEvent);
-		EventManager.StartListening("PlayerDamage", hit);
 	}
 
 	private void Update()
@@ -92,22 +86,16 @@ public class PlayerAttack : Player
 
 	private void AttackEvent(EventParam eventParam)
 	{
-		isAttack = eventParam.isAttack;
+		isAttack = eventParam.input.isAttack;
 	}
 
-	private void hit(EventParam eventParam)
-	{
-		hp=hp - eventParam.eventint;
-		ani.SetBool("Damage", true);
-		if (hp < 0)
-			this.gameObject.SetActive(false);
-	}
 
 	private void OnGUI()
 	{
 		GUIStyle gUIStyle = new GUIStyle();
 		gUIStyle.fontSize = 40;
+		gUIStyle.normal.textColor = Color.red;
 
-		GUI.Label(new Rect(0, 100, 5, 5), hp.ToString(), gUIStyle);
+		GUI.Label(new Rect(0, 100, 5, 5), "플레이어 HP = " + GameManager.Instance.PlayerData.hp.ToString(), gUIStyle);
 	}
 }

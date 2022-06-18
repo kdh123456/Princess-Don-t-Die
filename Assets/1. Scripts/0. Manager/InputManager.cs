@@ -11,10 +11,14 @@ public class InputManager : MonoBehaviour
 
 	private EventParam eventParam = new EventParam();
 
-
     void Update()
     {
 		GetMoveInput();
+		if(Input.GetKeyDown(KeyCode.I))
+		{
+			eventParam.input.isInventory = !eventParam.input.isInventory;
+			EventManager.TriggerEvent("ONINVENTORY",eventParam);
+		}
 	}
 
     private void GetMoveInput()
@@ -24,9 +28,9 @@ public class InputManager : MonoBehaviour
 		horizontal = moveInputs.x;
 		vertical = moveInputs.y;
 
-		eventParam.isAttack = Input.GetMouseButtonDown(0);
-		eventParam.runBool = Input.GetKey(KeyCode.LeftShift);
-		eventParam.eventVector = new Vector2(horizontal, vertical);
+		eventParam.input.isAttack = Input.GetMouseButtonDown(0);
+		eventParam.input.isRun = Input.GetKey(KeyCode.LeftShift);
+		eventParam.input.moveVector = new Vector2(horizontal, vertical);
 
 		EventManager.TriggerEvent("MoveInput", eventParam);
 		EventManager.TriggerEvent("IsAttack", eventParam);
