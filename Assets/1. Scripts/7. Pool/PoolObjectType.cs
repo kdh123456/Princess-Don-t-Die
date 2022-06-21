@@ -1,5 +1,6 @@
 public enum PoolObjectType
 {
 	HP,
-	MANA
+	MANA,
+	DAMAGEDEFFECT
 }

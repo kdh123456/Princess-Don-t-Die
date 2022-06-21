@@ -13,6 +13,7 @@ public class Interaction : MonoBehaviour
 			case "Health":
 				eventParam.items = Items.HPPositon;
 				EventManager.TriggerEvent("UpdateSlot", eventParam);
+				other.gameObject.SetActive(false);
 				ObjectPool.Instance.ReturnObject(PoolObjectType.HP, other.gameObject);
 				break;
 			case "Mana":

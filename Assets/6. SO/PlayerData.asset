@@ -15,7 +15,7 @@ MonoBehaviour:
   maxHp: 100
   maxMp: 50
   maxSt: 200
-  hp: 0
+  hp: 50
   Mp: 0
   St: 0
-  damage: 10
+  damage: 1000

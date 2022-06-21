@@ -54,7 +54,7 @@ public class PlayerMove : Player
 	{
 		Move();
 		BodyDirectChange();
-		MoveAnimation(playerState);
+		MoveAnimation();
 		setGravity();
 	}
 
@@ -89,7 +89,7 @@ public class PlayerMove : Player
 		Vector3 vecGravity = new Vector3(0f, verticalSpd, 0f);
 
 		//프레임이동량
-		Vector3 amount = (MoveDirect * spd * Time.deltaTime)+vecGravity;
+		Vector3 amount = (MoveDirect * spd * Time.deltaTime) + vecGravity;
 
 		//실제이동
 		collisionFlags = playerController.Move(amount);
@@ -132,25 +132,25 @@ public class PlayerMove : Player
 		}
 	}
 
-	private void MoveAnimation(PlayerState state)
+	private void MoveAnimation()
 	{
-		if (horizontal+vertical != 0 && !isRun)
+		if (horizontal != 0 || vertical != 0)
 		{
+			if (isRun)
+			{
+				playerState = PlayerState.Run;
+				ani.SetBool("IsRun", true);
+				return;
+			}
 			playerState = PlayerState.Walk;
 			ani.SetBool("IsWalk", true);
 			ani.SetBool("IsRun", false);
 		}
-		else if(horizontal + vertical == 0)
+		else if (horizontal == 0 && vertical == 0)
 		{
 			playerState = PlayerState.Idle;
 			ani.SetBool("IsWalk", false);
 			ani.SetBool("IsRun", false);
-		}
-		else if(horizontal + vertical != 0 && isRun)
-		{
-			playerState = PlayerState.Run;
-			ani.SetBool("IsWalk", false);
-			ani.SetBool("IsRun", true);
 		}
 	}
 

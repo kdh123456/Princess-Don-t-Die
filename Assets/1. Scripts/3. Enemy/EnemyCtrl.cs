@@ -83,9 +83,10 @@ public class EnemyCtrl : MonoBehaviour
 		ani.SetBool("isDamage", false);
 		ani.SetBool("isAttack", false);
 		skullState = SkullState.Idle;
-		effectDamage.GetComponent<ParticleSystem>().Pause();
-		effectDie.GetComponent<ParticleSystem>().Pause();
-		effectDamage.GetComponent<ParticleSystem>().Clear();
+		this.transform.GetChild(this.transform.childCount-1).gameObject.GetComponent<ParticleSystem>().Pause();
+		this.transform.GetChild(this.transform.childCount-1).gameObject.GetComponent<ParticleSystem>().Clear();
+		ObjectPool.Instance.ReturnObject(PoolObjectType.DAMAGEDEFFECT, this.transform.GetChild(this.transform.childCount-1).gameObject);
+		effectDamage.GetComponent<ParticleSystem>().Pause();		effectDie.GetComponent<ParticleSystem>().Pause();
 		effectDie.GetComponent<ParticleSystem>().Clear();
 	}
 
@@ -384,8 +385,10 @@ public class EnemyCtrl : MonoBehaviour
 			if (hp > 0)
 			{
 				//피격 이펙트 
-				effectDamage.GetComponent<ParticleSystem>().Clear();
-				effectDamage.GetComponent<ParticleSystem>().Play();
+				GameObject obj = ObjectPool.Instance.GetObject(PoolObjectType.DAMAGEDEFFECT);
+				obj.transform.parent = this.transform;
+				obj.transform.position = this.transform.position;
+
 
 				effectDamageTween();
 				//체력이 0 이상이면 피격 애니메이션을 연출 하고 
