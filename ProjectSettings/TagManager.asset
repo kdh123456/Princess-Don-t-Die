@@ -7,14 +7,15 @@ TagManager:
   - PlayerAtk
   - Health
   - Mana
+  - Princess
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
+  - Princess
   - 
   - 
   - 

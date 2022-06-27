@@ -48,6 +48,7 @@ public class EventManager : MonoSingleton<EventManager>
 public struct EventParam
 {
     public Inputs input;
+    public Information information;
     public Items items;
     public int eventint;
     public float eventFloat;
@@ -59,4 +60,10 @@ public struct Inputs
     public bool isRun;
     public bool isInventory;
     public Vector2 moveVector;
+}
+
+public struct Information
+{
+    public int maxHp;
+    public int hp;
 }

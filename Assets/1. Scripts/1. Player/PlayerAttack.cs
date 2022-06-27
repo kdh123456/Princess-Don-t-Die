@@ -21,12 +21,11 @@ public class PlayerAttack : Player
 		{
 			Attack();
 		}
-
-		EventManager.TriggerEvent("Attaking", eventParam1);
 	}
 	private void PlayerAttackAnimationEnd()
 	{
 		CheckAttackPhase();
+		EventManager.TriggerEvent("Attaking", eventParam1);
 	}
 
 	private void Attack()
@@ -37,10 +36,11 @@ public class PlayerAttack : Player
 			CountAttack = 1;
 			eventParam1.eventint = CountAttack;
 		}
-		if (ani.GetCurrentAnimatorStateInfo(1).normalizedTime >= 0.6f && ani.GetCurrentAnimatorStateInfo(1).normalizedTime < 1f)
+		if (ani.GetCurrentAnimatorStateInfo(1).normalizedTime >= 0.7f && ani.GetCurrentAnimatorStateInfo(1).normalizedTime < 1f)
 		{
 			CountAttack++;
 		}
+		EventManager.TriggerEvent("Attaking", eventParam1);
 	}
 
 	private void CheckAttackPhase()
@@ -87,15 +87,5 @@ public class PlayerAttack : Player
 	private void AttackEvent(EventParam eventParam)
 	{
 		isAttack = eventParam.input.isAttack;
-	}
-
-
-	private void OnGUI()
-	{
-		GUIStyle gUIStyle = new GUIStyle();
-		gUIStyle.fontSize = 40;
-		gUIStyle.normal.textColor = Color.red;
-
-		GUI.Label(new Rect(0, 100, 5, 5), "플레이어 HP = " + GameManager.Instance.PlayerData.hp.ToString(), gUIStyle);
 	}
 }

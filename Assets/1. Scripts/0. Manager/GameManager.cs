@@ -4,12 +4,36 @@ using UnityEngine;
 
 public class GameManager : MonoSingleton<GameManager>
 {
-    [SerializeField]
-    private PlayerDataSO playerDataSO;
-    public PlayerDataSO PlayerData => playerDataSO;
+	[SerializeField]
+	private PlayerDataSO playerDataSO;
+	[SerializeField]
+	private PrincessDataSO princessDataSO;
+
+	public StageSO[] stageSO;
+
+	public PlayerDataSO PlayerData => playerDataSO;
+	public PrincessDataSO PrincessData => princessDataSO;
+
+	public EnemySpawner enemySpawner;
+
+	public int StageCount = 0;
+
+	public GameObject PointedObjet;
 
 	private void Start()
 	{
-		playerDataSO.hp = PlayerData.maxHp;
+		playerDataSO.hp = playerDataSO.maxHp;
+		princessDataSO.hp = princessDataSO.maxHp;
+	}
+
+	private void Update()
+	{
+		Pointed();
+	}
+
+	private void Pointed()
+	{
+		if (!enemySpawner.isActiveAndEnabled)
+			PointedObjet.transform.LookAt(enemySpawner.transform.position);
 	}
 }

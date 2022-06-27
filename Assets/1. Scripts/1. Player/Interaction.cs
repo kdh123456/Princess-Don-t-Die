@@ -20,6 +20,8 @@ public class Interaction : MonoBehaviour
 				eventParam.items = Items.ManaPositon;
 				EventManager.TriggerEvent("UpdateSlot", eventParam);
 				ObjectPool.Instance.ReturnObject(PoolObjectType.MANA, other.gameObject);
+				other.gameObject.SetActive(false);
+				ObjectPool.Instance.ReturnObject(PoolObjectType.HP, other.gameObject);
 				break;
 		}
 	}

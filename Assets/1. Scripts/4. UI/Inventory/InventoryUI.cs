@@ -17,6 +17,10 @@ public class InventoryUI : MonoBehaviour
 		EventManager.StartListening("UpdateSlot", UpdateSlot);
 	}
 
+	public void OffInventory()
+	{
+		inventoryPanel.SetActive(false);
+	}
 	private void OnInventory(EventParam eventParam)
 	{
 		inventoryPanel.SetActive(eventParam.input.isInventory);

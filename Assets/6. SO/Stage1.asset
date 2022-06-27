@@ -9,13 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5ad3ffcdd704844589c638dca46858c, type: 3}
-  m_Name: PlayerData
+  m_Script: {fileID: 11500000, guid: 0c9b97b3ce55a414d9f54f56583397f5, type: 3}
+  m_Name: Stage1
   m_EditorClassIdentifier: 
-  maxHp: 100
-  maxMp: 50
-  maxSt: 200
-  hp: 100
-  Mp: 0
-  St: 0
-  damage: 10
+  stagePos: {x: 0, y: 0, z: 0}
+  enemyObjects: 03000000
+  prefabCount: 14000000
+  waitForCreateSecound: 1

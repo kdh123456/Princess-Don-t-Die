@@ -3,22 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HpBar : Bar
+public class HpBar : MonoBehaviour
 {
-    private Slider hpSlider;
-	private void Start()
+    [SerializeField]
+    private Slider PlayerhpSlider;
+    [SerializeField]
+    private RectTransform PlayerhpSliderRect;
+    [SerializeField]
+    private Slider PrincesshpSlider;
+    [SerializeField]
+    private RectTransform PrincesshpSliderRect;
+
+    private void Start()
 	{
-        EventManager.StartListening("HP", UpdateHpSlider);
-        hpSlider = GetComponent<Slider>();
-        hpSlider.GetComponent<RectTransform>().sizeDelta = new Vector2(playerDataSO.maxHp + 300,50);
+        EventManager.StartListening("HPPlayer", PlayerUpdateHpSlider);
+        EventManager.StartListening("HPPrincess", PrincessUpdateHpSlider);
+		PlayerhpSliderRect.sizeDelta = new Vector2(GameManager.Instance.PlayerData.maxHp + 300, 50);
+		PrincesshpSliderRect.sizeDelta = new Vector2(GameManager.Instance.PrincessData.maxHp+300, 50);
 	}
 	void Update()
     {
     }
 
-    private void UpdateHpSlider(EventParam eventParam)
+    private void PlayerUpdateHpSlider(EventParam eventParam)
 	{
-        hpSlider.maxValue = playerDataSO.maxHp;
-        hpSlider.value = playerDataSO.hp;
+        PlayerhpSlider.maxValue = GameManager.Instance.PlayerData.maxHp;
+        PlayerhpSlider.value = GameManager.Instance.PlayerData.hp;
     }
+
+    private void PrincessUpdateHpSlider(EventParam eventParam)
+	{
+        PrincesshpSlider.maxValue = GameManager.Instance.PrincessData.maxHp;
+        PrincesshpSlider.value = GameManager.Instance.PrincessData.hp;
+	}
 }

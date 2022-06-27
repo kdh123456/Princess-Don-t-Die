@@ -2,36 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UI;
 
-public class EnemyCtrl : MonoBehaviour
+public class EnemyCtrl : MonoBehaviour,OnHIt
 {
-	//해골 상태
 	public enum SkullState { None, Idle, Move, Wait, GoTarget, Atk, Damage, Die }
+	private int count = 0;
+	EventParam eventParam;
 
-	//해골 기본 속성
+	[SerializeField]
+	private GameObject objet;
+	private Canvas hpbarcanvas;
+	private GameObject hpbar;
+	private Slider hpBar;
+
+	#region Basic Variable
 	[Header("기본 속성")]
-	//해골 초기 상태
 	public SkullState skullState = SkullState.None;
-	//해골 이동 속도
+
 	public float spdMove = 1f;
-	//해골이 본 타겟
 	public GameObject targetCharactor = null;
-	//해골이 본 타겟 위치정보 (매번 안 찾을려고)
 	public Transform targetTransform = null;
-	//해골이 본 타겟 위치(매번 안 찾을려)
+	private Transform skullTransform = null;
 	public Vector3 posTarget = Vector3.zero;
 
-	//해골 애니메이션 컴포넌트 캐싱 
 	private Animator ani = null;
-	//해골 트랜스폼 컴포넌트 캐싱
-	private Transform skullTransform = null;
+	#endregion
 
-	private int count = 0;
-
+	#region Fight Variable
 	[Header("전투속성")]
 	//해골 체력
+	public float maxHp;
 	public float hp = 100;
 	public int atk = 50;
+	public int Atk { get => atk;  set => atk = value; }
 	//해골 공격 거리
 	public float AtkRange = 1.5f;
 	public ParticleSystem[] attackparticle;//해골 피격 이펙트
@@ -40,13 +44,20 @@ public class EnemyCtrl : MonoBehaviour
 	public GameObject effectDamage = null;
 	//해골 다이 이펙트
 	public GameObject effectDie = null;
-
 	private SkinnedMeshRenderer skinnedMeshRenderer = null;
+	#endregion
 
-	EventParam eventParam;
-	EventParam eventParam2;
-	// Start is called before the first frame update
 	void Start()
+	{
+		Init();
+	}
+	void Update()
+	{
+		CkState();
+		AnimationCtrl();
+		hpbar.transform.position = Camera.main.WorldToScreenPoint(new Vector3(transform.position.x, transform.position.y + 2, transform.position.z));
+	}
+	public void Init()
 	{
 		//처음 상태 대기상태
 		skullState = SkullState.Idle;
@@ -57,15 +68,69 @@ public class EnemyCtrl : MonoBehaviour
 
 		//스킨매쉬 캐싱
 		skinnedMeshRenderer = skullTransform.Find("SoldierRen").GetComponent<SkinnedMeshRenderer>();
-		EventManager.StartListening("Attaking", IsAttack);
-		for(int i = 0; i< attackparticle.Length; i++)
+		EventManager.StartListening("Attaking", IsAttacked);
+
+		for (int i = 0; i < attackparticle.Length; i++)
 		{
 			attackparticle[i].Pause();
 		}
+
 		effectDamage.GetComponent<ParticleSystem>().Pause();
 		effectDie.GetComponent<ParticleSystem>().Pause();
+
+		hpbarcanvas = GameObject.Find("EnemyCanvas").GetComponent<Canvas>();
+		maxHp = hp;
+		hpbar = Instantiate(objet, hpbarcanvas.transform);
+		hpBar = hpbar.GetComponent<Slider>();
+		UpdateSlider();
+		hpBar.gameObject.SetActive(false);
 	}
 
+	#region Animation
+	void AnimationCtrl()
+	{
+		//해골의 상태에 따라서 애니메이션 적용
+		switch (skullState)
+		{
+			//대기와 준비할 때 애니메이션 같.
+			case SkullState.Wait:
+			case SkullState.Idle:
+				//준비 애니메이션 실행
+				ani.SetBool("isAttack", false);
+				ani.SetBool("isWalk", false);
+				ani.SetBool("isDie", false);
+				ani.SetBool("isDamage", false);
+				break;
+			//랜덤과 목표 이동할 때 애니메이션 같.
+			case SkullState.Move:
+			case SkullState.GoTarget:
+				//이동 애니메이션 실행
+				ani.SetBool("isWalk", true);
+				ani.SetBool("isDie", false);
+				ani.SetBool("isDamage", false);
+				ani.SetBool("isAttack", false);
+				break;
+			//공격할 때
+			case SkullState.Atk:
+				//공격 애니메이션 실행
+				ani.SetBool("isWalk", true);
+				ani.SetBool("isDie", false);
+				ani.SetBool("isDamage", false);
+				ani.SetBool("isAttack", true);
+				break;
+			//죽었을 때
+			case SkullState.Die:
+				//죽을 때도 애니메이션 실행
+				ani.SetBool("isDie", true);
+				ani.SetBool("isDamage", false);
+				ani.SetBool("isAttack", false);
+				ani.SetBool("isWalk", false);
+				break;
+			default:
+				break;
+
+		}
+	}
 	void OnAtkAnmationFinished()
 	{
 		ani.SetBool("isWalk", false);
@@ -78,10 +143,6 @@ public class EnemyCtrl : MonoBehaviour
 
 	void OnDmgAnmationFinished()
 	{
-		ani.SetBool("isWalk", false);
-		ani.SetBool("isDie", false);
-		ani.SetBool("isDamage", false);
-		ani.SetBool("isAttack", false);
 		skullState = SkullState.Idle;
 		this.transform.GetChild(this.transform.childCount-1).gameObject.GetComponent<ParticleSystem>().Pause();
 		this.transform.GetChild(this.transform.childCount-1).gameObject.GetComponent<ParticleSystem>().Clear();
@@ -95,29 +156,9 @@ public class EnemyCtrl : MonoBehaviour
 		//몬스터 삭제 
 		gameObject.SetActive(false);
 	}
+	#endregion
 
-	/// <summary>
-	/// 애니메이션 이벤트를 추가해주는 함. 
-	/// </summary>
-	/// <param name="clip">애니메이션 클립 </param>
-	/// <param name="funcName">함수명 </param>
-	void OnAnimationEvent(AnimationClip clip, string funcName)
-	{
-		//애니메이션 이벤트를 만들어 준다
-		AnimationEvent retEvent = new AnimationEvent();
-		//애니메이션 이벤트에 호출 시킬 함수명
-		retEvent.functionName = funcName;
-		//애니메이션 클립 끝나기 바로 직전에 호출
-		retEvent.time = clip.length - 0.1f;
-		//위 내용을 이벤트에 추가 하여라
-		clip.AddEvent(retEvent);
-	}
-
-
-
-	/// <summary>
-	/// 해골 상태에 따라 동작을 제어하는 함수 
-	/// </summary>
+	#region State
 	void CkState()
 	{
 		switch (skullState)
@@ -137,17 +178,6 @@ public class EnemyCtrl : MonoBehaviour
 				break;
 		}
 	}
-
-	// Update is called once per frame
-	void Update()
-	{
-		CkState();
-		AnimationCtrl();
-	}
-
-	/// <summary>
-	/// 해골 상태가 대기 일 때 동작 
-	/// </summary>
 	void setIdle()
 	{
 		if (targetCharactor == null)
@@ -170,9 +200,6 @@ public class EnemyCtrl : MonoBehaviour
 		}
 	}
 
-	/// <summary>
-	/// 해골 상태가 이동 일 때 동 
-	/// </summary>
 	void setMove()
 	{
 		//출발점 도착점 두 벡터의 차이 
@@ -249,10 +276,6 @@ public class EnemyCtrl : MonoBehaviour
 		skullTransform.LookAt(posLookAt);
 	}
 
-	/// <summary>
-	/// 대기 상태 동작 함 
-	/// </summary>
-	/// <returns></returns>
 	IEnumerator setWait()
 	{
 		//해골 상태를 대기 상태로 바꿈
@@ -265,80 +288,6 @@ public class EnemyCtrl : MonoBehaviour
 		skullState = SkullState.Idle;
 	}
 
-	/// <summary>
-	/// 애니메이션을 재생시켜주는 함 
-	/// </summary>
-	void AnimationCtrl()
-	{
-		//해골의 상태에 따라서 애니메이션 적용
-		switch (skullState)
-		{
-			//대기와 준비할 때 애니메이션 같.
-			case SkullState.Wait:
-			case SkullState.Idle:
-				//준비 애니메이션 실행
-				ani.SetBool("isAttack", false);
-				ani.SetBool("isWalk", false);
-				ani.SetBool("isDie", false);
-				ani.SetBool("isDamage", false);
-				break;
-			//랜덤과 목표 이동할 때 애니메이션 같.
-			case SkullState.Move:
-			case SkullState.GoTarget:
-				//이동 애니메이션 실행
-				ani.SetBool("isWalk", true);
-				ani.SetBool("isDie", false);
-				ani.SetBool("isDamage", false);
-				ani.SetBool("isAttack", false);
-				break;
-			//공격할 때
-			case SkullState.Atk:
-				//공격 애니메이션 실행
-				ani.SetBool("isWalk", true);
-				ani.SetBool("isDie", false);
-				ani.SetBool("isDamage", false);
-				ani.SetBool("isAttack", true);
-				break;
-			//죽었을 때
-			case SkullState.Die:
-				//죽을 때도 애니메이션 실행
-				ani.SetBool("isDie", true);
-				ani.SetBool("isDamage", false);
-				ani.SetBool("isAttack", false);
-				ani.SetBool("isWalk", false);
-				break;
-			case SkullState.Damage:
-				ani.SetBool("isDie", false);
-				ani.SetBool("isDamage", true);
-				ani.SetBool("isAttack", false);
-				ani.SetBool("isWalk", false);
-				break;
-			default:
-				break;
-
-		}
-	}
-
-	///<summary>
-	///시야 범위 안에 다른 Trigger 또는 캐릭터가 들어오면 호출 된다.
-	///함수 동작은 목표물이 들어오면 목표물을 설정하고 해골을 타겟 위치로 이동 시킨다 
-	///</summary>
-
-	void OnCkTarget(GameObject target)
-	{
-		//목표 캐릭터에 파라메터로 검출된 오브젝트를 넣고 
-		targetCharactor = target;
-		//목표 위치에 목표 캐릭터의 위치 값을 넣습니다. 
-		targetTransform = targetCharactor.transform;
-
-		//목표물을 향해 해골이 이동하는 상태로 변경
-		skullState = SkullState.GoTarget;
-
-	}
-
-	/// <summary>
-	/// 해골 상태 공격 모드
-	/// </summary>
 	void setAtk()
 	{
 		//해골과 캐릭터간의 위치 거리 
@@ -351,9 +300,25 @@ public class EnemyCtrl : MonoBehaviour
 			skullState = SkullState.GoTarget;
 		}
 	}
+	#endregion
+	void OnCkTarget(GameObject target)
+	{
+		//목표 캐릭터에 파라메터로 검출된 오브젝트를 넣고 
+		targetCharactor = target;
+		//목표 위치에 목표 캐릭터의 위치 값을 넣습니다. 
+		targetTransform = targetCharactor.transform;
+
+		//목표물을 향해 해골이 이동하는 상태로 변경
+		skullState = SkullState.GoTarget;
+
+	}
 
 	void theAtk()
 	{
+		for (int i = 0; i < attackparticle.Length; i++)
+		{
+			attackparticle[i].gameObject.SetActive(true);
+		}
 		for (int i = 0; i < attackparticle.Length; i++)
 		{
 			attackparticle[i].Clear();
@@ -363,45 +328,23 @@ public class EnemyCtrl : MonoBehaviour
 
 		if (a.Length > 0)
 		{
-			eventParam2.eventint = atk;
-			EventManager.TriggerEvent("PlayerDamage", eventParam2);
+			for(int i = 0; i<a.Length; i++)
+			{
+				a[i].GetComponentInParent<OnHIt>().OnHit(Atk);
+			}
 		}
 	}
-
-
-	/// <summary>
-	/// 해골 피격 충돌 검출 
-	/// </summary>
-	/// <param name="other"></param>
+	#region Hit
 	private void OnTriggerEnter(Collider other)
 	{
 		//만약에 해골이 캐릭터 공격에 맞았다면
 		if (other.gameObject.CompareTag("PlayerAtk") == true && count < eventParam.eventint)
 		{
-			count++;
-			//해골 체력을 10 빼고 
-			Debug.Log("?");
-			hp -= GameManager.Instance.PlayerData.damage;
-			if (hp > 0)
-			{
-				//피격 이펙트 
-				GameObject obj = ObjectPool.Instance.GetObject(PoolObjectType.DAMAGEDEFFECT);
-				obj.transform.parent = this.transform;
-				obj.transform.position = this.transform.position;
-
-
-				effectDamageTween();
-				//체력이 0 이상이면 피격 애니메이션을 연출 하고 
-				skullState = SkullState.Damage;
-			}
-			else
-			{
-				//0 보다 작으면 해골이 죽음 상태로 바꾸어라  
-				skullState = SkullState.Die;
-				effectDie.GetComponent<ParticleSystem>().Play();
-				GameObject obj = ObjectPool.Instance.GetObject(PoolObjectType.HP);
-				StartCoroutine(Wait(obj));
-			}
+			ani.SetBool("isDie", false);
+			ani.SetBool("isDamage", true);
+			ani.SetBool("isAttack", false);
+			ani.SetBool("isWalk", false);
+			OnHit(other.GetComponentInParent<OnHIt>().Atk);
 		}
 	}
 	IEnumerator Wait(GameObject obj)
@@ -409,30 +352,19 @@ public class EnemyCtrl : MonoBehaviour
 		yield return new WaitForSeconds(1f);
 		obj.transform.position = this.transform.position;
 	}
-	/// <summary>
-	/// 피격시 몬스터 몸에서 번쩍번쩍 효과를 준다
-	/// </summary>
 	void effectDamageTween()
 	{
-		//트윈을 돌리다 또 트윈 함수가 진행되면 로직이 엉망이 될 수 있어서 
-		//트윈 중복 체크로 미리 차단을 해준다
-
-		//번쩍이는 이펙트 색상을 지정해준다
 		Color colorTo = Color.red;
 
 		skinnedMeshRenderer.material.DOColor(colorTo, 0f).OnComplete(OnDamageTweenFinished);
 	}
-
-	/// <summary>
-	/// 피격이펙트 종료시 이벤트 함수 호출
-	/// </summary>
 	void OnDamageTweenFinished()
 	{
 		//트윈이 끝나면 하얀색으로 확실히 색상을 돌려준다
 		skinnedMeshRenderer.material.DOColor(Color.white, 2f);
 	}
 
-	void IsAttack(EventParam events)
+	void IsAttacked(EventParam events)
 	{
 		eventParam = events;
 		if (eventParam.eventint == 0)
@@ -440,4 +372,45 @@ public class EnemyCtrl : MonoBehaviour
 			count = 0;
 		}
 	}
+
+	public void OnHit(int atk)
+	{
+		count++;
+		//해골 체력을 10 빼고 
+		hp -= atk;
+		hpBar.gameObject.SetActive(true);
+		UpdateSlider();
+		if (hp > 0)
+		{
+			//피격 이펙트 
+			skullState = SkullState.Damage;
+			GameObject obj = ObjectPool.Instance.GetObject(PoolObjectType.DAMAGEDEFFECT);
+			obj.transform.parent = this.transform;
+			obj.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + 1, this.transform.position.z);
+
+
+			effectDamageTween();
+			//체력이 0 이상이면 피격 애니메이션을 연출 하고 
+		}
+		else
+		{
+			//0 보다 작으면 해골이 죽음 상태로 바꾸어라  
+			skullState = SkullState.Die;
+			effectDie.GetComponent<ParticleSystem>().Play();
+			for(int i = 0; i<attackparticle.Length; i++)
+			{
+				attackparticle[i].gameObject.SetActive(false);
+			}
+			GameObject obj = ObjectPool.Instance.GetObject(PoolObjectType.HP);
+			StartCoroutine(Wait(obj));
+		}
+	}
+
+	public void UpdateSlider()
+	{
+		hpBar.maxValue = maxHp;
+		hpBar.value = hp;
+	}
+
+	#endregion
 }

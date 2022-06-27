@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SteminaBar : Bar
+public class SteminaBar : MonoBehaviour
 {
-    private Slider stSlider;
+    private Slider playerStSlider;
     private void Start()
     {
         EventManager.StartListening("STMINA", UpdateHpSlider);
-        stSlider = GetComponent<Slider>();
-        stSlider.GetComponent<RectTransform>().sizeDelta = new Vector2(playerDataSO.maxHp + 300, 50);
+        playerStSlider = GetComponent<Slider>();
+        playerStSlider.GetComponent<RectTransform>().sizeDelta = new Vector2(GameManager.Instance.PlayerData.maxSt + 300, 50);
     }
     void Update()
     {
@@ -18,7 +18,7 @@ public class SteminaBar : Bar
 
     private void UpdateHpSlider(EventParam eventParam)
     {
-        stSlider.maxValue = playerDataSO.maxSt;
-        stSlider.value = playerDataSO.St;
+        playerStSlider.maxValue = GameManager.Instance.PlayerData.maxSt;
+        playerStSlider.value = GameManager.Instance.PlayerData.St;
     }
 }

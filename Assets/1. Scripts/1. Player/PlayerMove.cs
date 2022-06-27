@@ -44,6 +44,9 @@ public class PlayerMove : Player
 
 	private EventParam eventParam;
 
+	private Vector3 minMap { get => new Vector3(GameManager.Instance.stageSO[GameManager.Instance.StageCount].stagePos.x-100,0, GameManager.Instance.stageSO[GameManager.Instance.StageCount].stagePos.z-100); }
+	private Vector3 maxMap { get => new Vector3(GameManager.Instance.stageSO[GameManager.Instance.StageCount].stagePos.x + 100, 0, GameManager.Instance.stageSO[GameManager.Instance.StageCount].stagePos.z + 100); }
+
 	protected override void Start()
 	{
 		base.Start();
@@ -56,8 +59,22 @@ public class PlayerMove : Player
 		BodyDirectChange();
 		MoveAnimation();
 		setGravity();
+		MapDistance();
 	}
+	private void MapDistance()
+	{
+		Vector3 vector3 = transform.position;
+		if (vector3.x < minMap.x)
+			vector3 = new Vector3(minMap.x, vector3.y, vector3.z);
+		if (vector3.z < minMap.z)
+			vector3 = new Vector3(vector3.x, vector3.y, minMap.z);
+		if(vector3.x > maxMap.x)
+			vector3 = new Vector3(maxMap.x, vector3.y, vector3.z);
+		if(vector3.z > maxMap.z)
+			vector3 = new Vector3(vector3.x, vector3.y, maxMap.z);
 
+		this.transform.position = vector3;
+	}
 	private void Move()
 	{
 		//백터 내적
