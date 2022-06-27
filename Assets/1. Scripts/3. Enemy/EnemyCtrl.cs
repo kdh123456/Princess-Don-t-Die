@@ -47,6 +47,10 @@ public class EnemyCtrl : MonoBehaviour,OnHIt
 	private SkinnedMeshRenderer skinnedMeshRenderer = null;
 	#endregion
 
+	private void Awake()
+	{
+		this.gameObject.transform.position = new Vector3(120, 0f, 142.6f);
+	}
 	void Start()
 	{
 		Init();
@@ -153,8 +157,8 @@ public class EnemyCtrl : MonoBehaviour,OnHIt
 
 	void OnDieAnmationFinished()
 	{
-		//몬스터 삭제 
 		gameObject.SetActive(false);
+		ObjectPool.Instance.ReturnObject(PoolObjectType.Soldier, gameObject);
 	}
 	#endregion
 
@@ -401,6 +405,8 @@ public class EnemyCtrl : MonoBehaviour,OnHIt
 			{
 				attackparticle[i].gameObject.SetActive(false);
 			}
+			hpBar.gameObject.SetActive(false);
+			GameManager.Instance.PlayerData.Money += 5;
 			GameObject obj = ObjectPool.Instance.GetObject(PoolObjectType.HP);
 			StartCoroutine(Wait(obj));
 		}
@@ -413,4 +419,9 @@ public class EnemyCtrl : MonoBehaviour,OnHIt
 	}
 
 	#endregion
+
+	private void OnDestroy()
+	{
+		EventManager.StopListening("Attaking", IsAttacked);
+	}
 }

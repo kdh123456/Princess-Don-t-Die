@@ -198,22 +198,14 @@ public class Princess : MonoBehaviour,OnHIt
 		{
 			princessAnimator.SetBool("isDamage", true);
 			GameManager.Instance.PrincessData.hp -= atk;
-			EventManager.TriggerEvent("HPPrincess", eventParam);
+			EventManager.TriggerEvent("PRUPDATESLIDER", eventParam);
 			//공주 hp바도 해주고
 			if (GameManager.Instance.PrincessData.hp <= 0)
 			{
+				EventManager.TriggerEvent("Dead", eventParam);
 				this.gameObject.SetActive(false);
 			}
 		}
-	}
-
-	private void OnGUI()
-	{
-		GUIStyle gUIStyle = new GUIStyle();
-		gUIStyle.fontSize = 40;
-		gUIStyle.normal.textColor = Color.red;
-
-		GUI.Label(new Rect(0, 100, 5, 5), "공주 HP = " + GameManager.Instance.PrincessData.hp.ToString(), gUIStyle);
 	}
 
 	public void OnDmgAnmationFinished()

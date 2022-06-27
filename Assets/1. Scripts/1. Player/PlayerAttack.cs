@@ -88,4 +88,9 @@ public class PlayerAttack : Player
 	{
 		isAttack = eventParam.input.isAttack;
 	}
+
+	private void OnDestroy()
+	{
+		EventManager.StopListening("IsAttack", AttackEvent);
+	}
 }

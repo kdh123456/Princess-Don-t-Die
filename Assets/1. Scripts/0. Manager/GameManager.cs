@@ -11,7 +11,7 @@ public class GameManager : MonoSingleton<GameManager>
 
 	public StageSO[] stageSO;
 
-	public PlayerDataSO PlayerData => playerDataSO;
+	public PlayerDataSO PlayerData { get => playerDataSO; set => playerDataSO = value;}
 	public PrincessDataSO PrincessData => princessDataSO;
 
 	public EnemySpawner enemySpawner;
@@ -28,12 +28,14 @@ public class GameManager : MonoSingleton<GameManager>
 
 	private void Update()
 	{
-		Pointed();
+		//Pointed();
 	}
 
 	private void Pointed()
 	{
 		if (!enemySpawner.isActiveAndEnabled)
-			PointedObjet.transform.LookAt(enemySpawner.transform.position);
+		{
+
+		}
 	}
 }

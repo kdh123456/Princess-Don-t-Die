@@ -47,4 +47,10 @@ public class InventoryUI : MonoBehaviour
 		}
 
 	}
+
+	private void OnDestroy()
+	{
+		EventManager.StopListening("ONINVENTORY", OnInventory);
+		EventManager.StopListening("UpdateSlot", UpdateSlot);
+	}
 }

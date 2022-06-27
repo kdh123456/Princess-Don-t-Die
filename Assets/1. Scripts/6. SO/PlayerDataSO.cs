@@ -9,9 +9,13 @@ public class PlayerDataSO : ScriptableObject
 	public float maxMp;
 	public float maxSt;
 
-	public float hp;
+	private float Hp;
+	private float st;
+
+	public float Money;
+	public float hp { get => Hp; set => Hp =Mathf.Clamp(value, 0, maxHp); }
 	public float Mp;
-	public float St;
+	public float St { get => st;  set => st = Mathf.Clamp(value, 0, maxSt); }
 
 	public float damage;
 }

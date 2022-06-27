@@ -17,6 +17,10 @@ public class Player : MonoBehaviour,OnHIt
 
 	EventParam eventParam;
 
+	protected virtual void Awake()
+	{
+		this.gameObject.transform.position = new Vector3(117.8f, 0f, 142.6f);
+	}
 	protected virtual void Start()
 	{
 		atk = (int)GameManager.Instance.PlayerData.damage;
@@ -36,17 +40,12 @@ public class Player : MonoBehaviour,OnHIt
 		{
 			ani.SetBool("Damage", true);
 			GameManager.Instance.PlayerData.hp -= atk;
-			EventManager.TriggerEvent("HPPlayer", eventParam);
+			EventManager.TriggerEvent("PUPDATESLIDER", eventParam);
 			if (GameManager.Instance.PlayerData.hp <= 0)
+			{
+				EventManager.TriggerEvent("Dead", eventParam);
 				this.gameObject.SetActive(false);
+			}
 		}
 	}
-	//private void OnGUI()
-	//{
-	//	GUIStyle gUIStyle = new GUIStyle();
-	//	gUIStyle.fontSize = 40;
-	//	gUIStyle.normal.textColor = Color.red;
-
-	//	GUI.Label(new Rect(0, 100, 5, 5), "플레이어 HP = " + GameManager.Instance.PlayerData.hp.ToString(), gUIStyle);
-	//}
 }

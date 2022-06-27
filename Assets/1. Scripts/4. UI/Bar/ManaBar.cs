@@ -21,4 +21,9 @@ public class ManaBar : MonoBehaviour
         mpSlider.maxValue = GameManager.Instance.PlayerData.maxMp;
         mpSlider.value = GameManager.Instance.PlayerData.Mp;
     }
+
+	private void OnDestroy()
+	{
+        EventManager.StopListening("MANA", UpdateHpSlider);
+    }
 }

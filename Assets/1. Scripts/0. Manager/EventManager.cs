@@ -59,6 +59,7 @@ public struct Inputs
     public bool isAttack;
     public bool isRun;
     public bool isInventory;
+    public bool isStore;
     public Vector2 moveVector;
 }
 

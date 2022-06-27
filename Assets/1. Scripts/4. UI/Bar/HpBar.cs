@@ -16,8 +16,8 @@ public class HpBar : MonoBehaviour
 
     private void Start()
 	{
-        EventManager.StartListening("HPPlayer", PlayerUpdateHpSlider);
-        EventManager.StartListening("HPPrincess", PrincessUpdateHpSlider);
+        EventManager.StartListening("PUPDATESLIDER", PlayerUpdateHpSlider);
+        EventManager.StartListening("PRUPDATESLIDER", PrincessUpdateHpSlider);
 		PlayerhpSliderRect.sizeDelta = new Vector2(GameManager.Instance.PlayerData.maxHp + 300, 50);
 		PrincesshpSliderRect.sizeDelta = new Vector2(GameManager.Instance.PrincessData.maxHp+300, 50);
 	}
@@ -36,4 +36,10 @@ public class HpBar : MonoBehaviour
         PrincesshpSlider.maxValue = GameManager.Instance.PrincessData.maxHp;
         PrincesshpSlider.value = GameManager.Instance.PrincessData.hp;
 	}
+
+	private void OnDestroy()
+	{
+        EventManager.StopListening("PUPDATESLIDER", PlayerUpdateHpSlider);
+        EventManager.StopListening("PRUPDATESLIDER", PrincessUpdateHpSlider);
+    }
 }

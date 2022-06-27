@@ -34,4 +34,9 @@ public class Item : MonoBehaviour
 	{
 		GameManager.Instance.PlayerData.Mp += 10;
 	}
+
+	private void OnDestroy()
+	{
+		EventManager.StopListening("ExecuteItem", CheckItem);
+	}
 }

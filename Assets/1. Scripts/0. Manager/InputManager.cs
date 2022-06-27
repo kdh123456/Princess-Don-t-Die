@@ -17,7 +17,12 @@ public class InputManager : MonoBehaviour
 		if(Input.GetKeyDown(KeyCode.I))
 		{
 			eventParam.input.isInventory = !eventParam.input.isInventory;
-			EventManager.TriggerEvent("ONINVENTORY",eventParam);
+			EventManager.TriggerEvent("ONINVENTORY", eventParam);
+		}
+		if (Input.GetKeyDown(KeyCode.K))
+		{
+			eventParam.input.isStore = !eventParam.input.isStore;
+			EventManager.TriggerEvent("ONSTORE", eventParam);
 		}
 	}
 

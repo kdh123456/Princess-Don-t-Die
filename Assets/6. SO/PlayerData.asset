@@ -12,10 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ad3ffcdd704844589c638dca46858c, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: 
-  maxHp: 100
+  maxHp: 200
   maxMp: 50
-  maxSt: 200
-  hp: 100
+  maxSt: 300
+  Money: 35
   Mp: 0
-  St: 0
-  damage: 10
+  damage: 50

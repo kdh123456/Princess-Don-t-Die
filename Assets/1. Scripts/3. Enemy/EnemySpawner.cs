@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-	public PoolObjectType[] enemyObjects { get => GameManager.Instance.stageSO[GameManager.Instance.StageCount].enemyObjects; set => enemyObjects = GameManager.Instance.stageSO[GameManager.Instance.StageCount].enemyObjects;}
+	public PoolObjectType[] enemyObjects { get => GameManager.Instance.stageSO[GameManager.Instance.StageCount].enemyObjects; set => enemyObjects = GameManager.Instance.stageSO[GameManager.Instance.StageCount].enemyObjects; }
 	public int[] prefabCount { get => GameManager.Instance.stageSO[GameManager.Instance.StageCount].prefabCount; }
 	public float waitforCreateSecound { get => GameManager.Instance.stageSO[GameManager.Instance.StageCount].waitForCreateSecound; }
 
@@ -13,12 +13,11 @@ public class EnemySpawner : MonoBehaviour
 	private int j;
 	private int i;
 
+	private bool isEnd = false;
+
 	private void Start()
 	{
-		for(i = 0; i<enemyObjects.Length; i++)
-		{
-			StartCoroutine(StageStart(i));
-		}
+		this.transform.position = GameManager.Instance.stageSO[GameManager.Instance.StageCount].stagePos;
 	}
 
 	private void Update()
@@ -32,21 +31,43 @@ public class EnemySpawner : MonoBehaviour
 		Vector3 a = Random.onUnitSphere;
 		obj.transform.parent = this.transform;
 		obj.transform.position = new Vector3(a.x, 0, a.z) * Random.Range(0f, round) + this.transform.position;
+		j++;
 		yield return new WaitForSeconds(waitforCreateSecound);
 		if (j != prefabCount[ii])
 			StartCoroutine(StageStart(ii));
 		else
-			j = 0;
-	}
-
-	private void EndStage()
-	{
-		if(this.gameObject.transform.childCount <= 0)
 		{
-			GameManager.Instance.StageCount++;
-			this.transform.position = GameManager.Instance.stageSO[GameManager.Instance.StageCount].stagePos;
-			enemyObjects = GameManager.Instance.stageSO[GameManager.Instance.StageCount].enemyObjects;
-			gameObject.SetActive(false);
+			isEnd = true;
+			j = 0;
 		}
 	}
+	EventParam eventParam;
+	private void EndStage()
+	{
+		if (this.gameObject.transform.childCount <= 0 && isEnd)
+		{
+			if (GameManager.Instance.StageCount < GameManager.Instance.stageSO.Length)
+			{
+				GameManager.Instance.StageCount++;
+			this.transform.position = GameManager.Instance.stageSO[GameManager.Instance.StageCount].stagePos;
+			enemyObjects = GameManager.Instance.stageSO[GameManager.Instance.StageCount].enemyObjects;
+			//EventManager.TriggerEvent("SceneStart", eventParam);
+			}
+
+			isEnd = false;
+			//gameObject.SetActive(false);
+		}
+	}
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.CompareTag("Player"))
+		{
+			for (i = 0; i < enemyObjects.Length; i++)
+			{
+				StartCoroutine(StageStart(i));
+			}
+		}
+	}
+
+
 }
