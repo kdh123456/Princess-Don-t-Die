@@ -15,4 +15,4 @@ MonoBehaviour:
   stagePos: {x: 216.7, y: 0, z: 210.3}
   enemyObjects: 03000000
   prefabCount: 0a000000
-  waitForCreateSecound: 1
+  waitForCreateSecound: 2

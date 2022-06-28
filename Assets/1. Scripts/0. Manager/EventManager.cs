@@ -60,6 +60,7 @@ public struct Inputs
     public bool isRun;
     public bool isInventory;
     public bool isStore;
+    public bool isSetting;
     public Vector2 moveVector;
 }
 

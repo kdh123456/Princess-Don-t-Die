@@ -24,6 +24,11 @@ public class InputManager : MonoBehaviour
 			eventParam.input.isStore = !eventParam.input.isStore;
 			EventManager.TriggerEvent("ONSTORE", eventParam);
 		}
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			eventParam.input.isSetting = !eventParam.input.isSetting;
+			EventManager.TriggerEvent("ONST", eventParam);
+		}
 	}
 
     private void GetMoveInput()

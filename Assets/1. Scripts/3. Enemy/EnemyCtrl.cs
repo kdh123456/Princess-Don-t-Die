@@ -275,7 +275,7 @@ public class EnemyCtrl : MonoBehaviour,OnHIt
 		Vector3 amount = direction * spdMove * Time.deltaTime;
 
 		//캐릭터 컨트롤이 아닌 트랜스폼으로 월드 좌표 이용하여 이동
-		skullTransform.Translate(amount, Space.World);
+		skullTransform.Translate(amount, Space.Self);
 		//캐릭터 방향 정하기
 		skullTransform.LookAt(posLookAt);
 	}
