@@ -14,11 +14,6 @@ public class EnemySpawner : MonoBehaviour
 
 	private void Start()
 	{
-		enemyObjects = GameManager.Instance.stageSO[GameManager.Instance.StageCount].enemyObjects;
-		prefabCount = GameManager.Instance.stageSO[GameManager.Instance.StageCount].prefabCount;
-		waitforCreateSecound = GameManager.Instance.stageSO[GameManager.Instance.StageCount].waitForCreateSecound;
-
-		this.transform.position = GameManager.Instance.stageSO[GameManager.Instance.StageCount].stagePos;
 	}
 
 	private IEnumerator StageStart(int ii)
